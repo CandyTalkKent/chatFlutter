@@ -10,8 +10,8 @@ MessagePacket _$MessagePacketFromJson(Map<String, dynamic> json) {
   return MessagePacket()
     ..command = json['command'] as String
     ..message = json['message'] as String
-    ..fromUser = json['fromUser'] as Map<String, dynamic>
-    ..toUser = json['toUser'] as Map<String, dynamic>;
+    ..fromUser = json['fromUser']
+    ..toUser = json['toUser'];
 }
 
 Map<String, dynamic> _$MessagePacketToJson(MessagePacket instance) =>

@@ -1,8 +1,16 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:ui_with_fluttrer/common/PacketEncode.dart';
+import 'package:ui_with_fluttrer/models/index.dart';
+import 'package:ui_with_fluttrer/models/User.dart';
+import 'package:ui_with_fluttrer/routes/ChatScreenRoute.dart';
+import 'package:ui_with_fluttrer/routes/MessagersListRoute.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:convert';
 
 class LoginRoute extends StatefulWidget {
   @override
@@ -207,6 +215,8 @@ class _LoginPageState extends State<LoginRoute> {
           _focusNodeUserName.unfocus();
 
           if (_formKey.currentState.validate()) {
+            int login = 1;
+            int algorithm = 1;
             //只有输入通过验证，才会执行这里
             _formKey.currentState.save();
             //todo 登录操作
@@ -215,9 +225,18 @@ class _LoginPageState extends State<LoginRoute> {
             //连接netty 后台服务端进行长连接
             WebSocketChannel channel =
                 IOWebSocketChannel.connect('ws://111.231.77.71:8081/websocket');
-            channel.stream.listen((data) => {
-              print(data)
-            }).onError(() => {});
+
+            User user = new User();
+            user.userName = "$_username";
+
+            var loginRequest =
+                LoginRequest.wrap(user: user, password: "$_password");
+
+            Uint8List bytes =
+                PacketEncode.encode(loginRequest, login, algorithm);
+            channel.sink.add(bytes);
+
+            channel.stream.listen((data) => {_dealWithResponse(data)});
           }
         },
       ),
@@ -344,6 +363,53 @@ class _LoginPageState extends State<LoginRoute> {
           ],
         ),
       ),
+    );
+  }
+
+  void _dealWithResponse(data) {
+    print(data);
+    Map<String, dynamic> jsonObject = json.decode(data);
+    if (jsonObject["resCode"] == "200" &&
+        jsonObject["message"] == "login success") {
+      //登陆成功
+
+      //调用navigate
+      Navigator.push(
+          context,
+          new MaterialPageRoute(
+              maintainState: false,
+              builder: (context) {
+                return new MessagersListRoute();
+              }));
+    } else {
+      _notSatisfied();
+    }
+  }
+
+  Future<void> _notSatisfied() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('提示'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('用户名或者密码错误请重新输入'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('知道了'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -1,10 +1,6 @@
 {
   "command": "",
   "message": "",
-  "fromUser": {
-
-  },
-  "toUser": {
-
-  }
+  "fromUser": "$User",
+  "toUser": "$User"
 }

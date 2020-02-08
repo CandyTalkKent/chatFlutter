@@ -1,5 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:ui_with_fluttrer/routes/ChatMessage.dart';
+import 'package:ui_with_fluttrer/components/ChatMessage.dart';
+
+class ChatScreenRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(""),
+      ),
+      body: new ChatScreen(),
+    );
+  }
+}
+
 class ChatScreen extends StatefulWidget {
   @override
   ChatScreenState createState() => ChatScreenState();
@@ -30,7 +44,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         new Container(
           //new
           decoration:
-          new BoxDecoration(color: Theme.of(context).cardColor), //new
+              new BoxDecoration(color: Theme.of(context).cardColor), //new
           child: _buildTextComposer(), //modified
         ), //new
       ], //new
@@ -56,7 +70,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     })
                   },
                   decoration:
-                  new InputDecoration.collapsed(hintText: "Send a message"),
+                      new InputDecoration.collapsed(hintText: "Send a message"),
                 ),
               ),
               new Container(
@@ -85,8 +99,9 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   void _handleSubmitted(String text) {
     _textController.clear();
-    setState(() {                                                    //new
-      _isComposing = false;                                          //new
+    setState(() {
+      //new
+      _isComposing = false; //new
     });
     ChatMessage message = new ChatMessage(
       //new
