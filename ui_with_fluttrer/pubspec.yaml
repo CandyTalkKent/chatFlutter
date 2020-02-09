@@ -33,6 +33,8 @@ dependencies:
   #第三方icon
   font_awesome_flutter: ^8.2.0
 
+  dio: ^3.0.8
+
 
 
 dev_dependencies:

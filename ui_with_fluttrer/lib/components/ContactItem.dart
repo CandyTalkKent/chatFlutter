@@ -3,16 +3,11 @@ import 'package:ui_with_fluttrer/common/Global.dart';
 import 'package:ui_with_fluttrer/models/User.dart';
 import 'package:ui_with_fluttrer/routes/ChatScreenRoute.dart';
 
-class MessagerItem extends StatelessWidget {
+class ContactItem extends StatelessWidget{
   User user;
 
-  MessagerItem({this.user});
+  ContactItem({this.user});
 
-
-//  ClipRRect( //剪裁为圆角矩形
-//  borderRadius: BorderRadius.circular(5.0),
-//  child: avatar,
-//  ),
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -39,7 +34,7 @@ class MessagerItem extends StatelessWidget {
               title: Text(Global.getUser().userName == user.userName
                   ? "我"
                   : user.userName),
-              subtitle: Text('last message'),
+              subtitle: SizedBox(),
               onTap: () => _dealWithTap(context),
             ),
           ],

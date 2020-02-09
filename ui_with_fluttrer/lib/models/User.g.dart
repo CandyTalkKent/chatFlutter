@@ -8,7 +8,7 @@ part of 'User.dart';
 
 User _$UserFromJson(Map<String, dynamic> json) {
   return User()
-    ..userId = json['userId'] as String
+    ..userId = json['userId'] as int
     ..userName = json['userName'] as String
     ..password = json['password'] as String
     ..phone = json['phone'] as String

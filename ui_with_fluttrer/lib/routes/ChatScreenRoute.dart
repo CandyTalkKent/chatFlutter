@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:ui_with_fluttrer/components/ChatMessage.dart';
+import 'package:ui_with_fluttrer/models/User.dart';
 
 class ChatScreenRoute extends StatelessWidget {
+  User user;
+
+  ChatScreenRoute({this.user});
+
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text(""),
+        title: Text(user.userName),
       ),
       body: new ChatScreen(),
     );

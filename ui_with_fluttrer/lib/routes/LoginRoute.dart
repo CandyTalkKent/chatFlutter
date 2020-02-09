@@ -1,16 +1,16 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:ui_with_fluttrer/common/Global.dart';
 import 'package:ui_with_fluttrer/common/PacketEncode.dart';
-import 'package:ui_with_fluttrer/models/index.dart';
 import 'package:ui_with_fluttrer/models/User.dart';
-import 'package:ui_with_fluttrer/routes/ChatScreenRoute.dart';
+import 'package:ui_with_fluttrer/models/index.dart';
 import 'package:ui_with_fluttrer/routes/MessagersListRoute.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'dart:convert';
 
 class LoginRoute extends StatefulWidget {
   @override
@@ -29,13 +29,12 @@ class _LoginPageState extends State<LoginRoute> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   var _password = ''; //用户名
-  var _username = ''; //密码
+  var _phone = ''; //密码
   var _isShowPwd = false; //是否显示密码
   var _isShowClear = false; //是否显示输入框尾部的清除按钮
 
   @override
   void initState() {
-    // TODO: implement initState
     //设置焦点监听
     _focusNodeUserName.addListener(_focusNodeListener);
     _focusNodePassWord.addListener(_focusNodeListener);
@@ -163,7 +162,7 @@ class _LoginPageState extends State<LoginRoute> {
               validator: validateUserName,
               //保存数据
               onSaved: (String value) {
-                _username = value;
+                _phone = value;
               },
             ),
             new TextFormField(
@@ -220,14 +219,14 @@ class _LoginPageState extends State<LoginRoute> {
             //只有输入通过验证，才会执行这里
             _formKey.currentState.save();
             //todo 登录操作
-            print("$_username + $_password");
+            print("$_phone + $_password");
 
             //连接netty 后台服务端进行长连接
             WebSocketChannel channel =
                 IOWebSocketChannel.connect('ws://111.231.77.71:8081/websocket');
 
             User user = new User();
-            user.userName = "$_username";
+            user.phone = "$_phone";
 
             var loginRequest =
                 LoginRequest.wrap(user: user, password: "$_password");
@@ -236,7 +235,7 @@ class _LoginPageState extends State<LoginRoute> {
                 PacketEncode.encode(loginRequest, login, algorithm);
             channel.sink.add(bytes);
 
-            channel.stream.listen((data) => {_dealWithResponse(data)});
+            channel.stream.listen((data) => {_dealWithResponse(data, channel)});
           }
         },
       ),
@@ -366,15 +365,21 @@ class _LoginPageState extends State<LoginRoute> {
     );
   }
 
-  void _dealWithResponse(data) {
+  void _dealWithResponse(data, WebSocketChannel channel) {
     print(data);
     Map<String, dynamic> jsonObject = json.decode(data);
     if (jsonObject["resCode"] == "200" &&
         jsonObject["message"] == "login success") {
       //登陆成功
 
+      //保存用户信息以及连接
+      Map userJson = jsonObject["data"]["user"];
+      User user = User.fromJson(userJson);
+      Global.saveUser(user);
+      Global.saveWebSocketChannel(channel);
+
       //调用navigate
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           new MaterialPageRoute(
               maintainState: false,

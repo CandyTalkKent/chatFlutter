@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:ui_with_fluttrer/models/Serializable.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class PacketEncode {
 
