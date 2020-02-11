@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:ui_with_fluttrer/models/User.dart';
 
 
 class ChatMessage extends StatelessWidget {
-  String _name = "王博";
-  bool selfFlag = true;  // true 表示本人发出的信息   false 表示他人发出的信息
+  User user;
+  bool selfFlag;  // true 表示本人发出的信息   false 表示他人发出的信息
 
-  ChatMessage({this.text, this.animationController,this.selfFlag=true});
+  ChatMessage({this.user,this.text, this.animationController,this.selfFlag=true});
 
   final AnimationController animationController;
   final String text;
@@ -31,7 +32,7 @@ class ChatMessage extends StatelessWidget {
           child: new Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              new Text(_name, style: Theme.of(context).textTheme.subhead),
+              new Text(user.userName, style: Theme.of(context).textTheme.subhead),
               new Container(
                 margin: const EdgeInsets.only(top: 5.0),
                 child: new Text(text),
@@ -41,7 +42,7 @@ class ChatMessage extends StatelessWidget {
         ),
         new Container(
           margin: const EdgeInsets.only( left : 16.0),
-          child: new CircleAvatar(child: new Text(_name[0])),
+          child: new CircleAvatar(child: new Text(user.userName[0])),
         ),
       ],
     );
@@ -54,13 +55,13 @@ class ChatMessage extends StatelessWidget {
       children: <Widget>[
         new Container(
           margin: const EdgeInsets.only(right: 16.0),
-          child: new CircleAvatar(child: new Text(_name[0])),
+          child: new CircleAvatar(child: new Text(user.userName[0])),
         ),
         new Expanded(
           child: new Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              new Text(_name, style: Theme.of(context).textTheme.subhead),
+              new Text(user.userName, style: Theme.of(context).textTheme.subhead),
               new Container(
                 margin: const EdgeInsets.only(top: 5.0),
                 child: new Text(text),

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ui_with_fluttrer/common/DioUtil.dart';
@@ -7,7 +5,6 @@ import 'package:ui_with_fluttrer/common/Global.dart';
 import 'package:ui_with_fluttrer/components/ContactItem.dart';
 import 'package:ui_with_fluttrer/components/MessagerItem.dart';
 import 'package:ui_with_fluttrer/models/index.dart';
-import 'package:dio/dio.dart';
 
 class MessagersListRoute extends StatelessWidget {
   @override
@@ -78,7 +75,7 @@ class MessagersListState extends State<MessagersList> {
               icon: Icon(FontAwesomeIcons.user), title: Text('我')),
         ],
         currentIndex: _selectedIndex,
-        fixedColor: Colors.blue,
+        fixedColor:  Colors.amberAccent,
         onTap: _onItemTapped,
       ),
     );
@@ -123,54 +120,16 @@ class MessagersListState extends State<MessagersList> {
   Widget _buildAppBar(int selectedIndex) {
     if (selectedIndex == 0) {
       return AppBar(
+        backgroundColor: Colors.amberAccent,
         title: Text("博信"),
       );
     }
 
     if (selectedIndex == 1) {
       return AppBar(
+        backgroundColor: Colors.amberAccent,
         title: Text("通讯录"),
       );
     }
   }
 }
-
-//class ContactListBody extends StatefulWidget {
-//  @override
-//  ContactListBodyState createState() => ContactListBodyState();
-//}
-
-//class ContactListBodyState extends State<ContactListBody> {
-//  List<ContactItem> _contactList = new List<ContactItem>();
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    if (_contactList.isEmpty) {
-//      _contactList.add(new ContactItem(
-//        user: Global.user,
-//      ));
-//
-//      //从服务器获取联系人列表
-//      var future = DioUtil.get("http://111.231.77.71:8083/contact/list",
-//          {"userId": Global.user.userId});
-//      future.then((response) {
-//        var list = response.data["data"];
-//        for(var json in list){
-//          User user = User.fromJson(json);
-//          _contactList.add(new ContactItem(user: user,));
-//        }
-//      });
-//    }
-//
-//    return ListView.builder(
-//        // Let the ListView know how many items it needs to build.
-//        itemCount: _contactList.length,
-//        // Provide a builder function. This is where the magic happens.
-//        // Convert each item into a widget based on the type of item it is.
-//        itemBuilder: (context, index) {
-//          final item = _contactList[index];
-//          return item;
-//        });
-//    ;
-//  }
-//}

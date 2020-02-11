@@ -46,7 +46,7 @@ class ContactItem extends StatelessWidget{
 
   void _dealWithTap(BuildContext context) {
     Navigator.push(context, new MaterialPageRoute(builder: (context) {
-      return new ChatScreenRoute(user: user,);
+      return new ChatScreenRoute( user: user,);
     }));
   }
 }

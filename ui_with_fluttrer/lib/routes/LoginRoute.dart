@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -9,8 +10,6 @@ import 'package:ui_with_fluttrer/common/PacketEncode.dart';
 import 'package:ui_with_fluttrer/models/User.dart';
 import 'package:ui_with_fluttrer/models/index.dart';
 import 'package:ui_with_fluttrer/routes/MessagersListRoute.dart';
-import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class LoginRoute extends StatefulWidget {
   @override
@@ -24,6 +23,8 @@ class _LoginPageState extends State<LoginRoute> {
 
   //用户名输入框控制器，此控制器可以监听用户名输入框操作
   TextEditingController _userNameController = new TextEditingController();
+
+  StreamSubscription streamSubscription;
 
   //表单状态
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -222,9 +223,6 @@ class _LoginPageState extends State<LoginRoute> {
             print("$_phone + $_password");
 
             //连接netty 后台服务端进行长连接
-            WebSocketChannel channel =
-                IOWebSocketChannel.connect('ws://111.231.77.71:8081/websocket');
-
             User user = new User();
             user.phone = "$_phone";
 
@@ -233,9 +231,16 @@ class _LoginPageState extends State<LoginRoute> {
 
             Uint8List bytes =
                 PacketEncode.encode(loginRequest, login, algorithm);
-            channel.sink.add(bytes);
 
-            channel.stream.listen((data) => {_dealWithResponse(data, channel)});
+
+            Global.getWebSocketChannel().sink.add(bytes);
+
+
+            streamSubscription= Global.getStreamController().stream.listen((data) {
+              _dealWithResponse(data,streamSubscription);
+            });
+
+
           }
         },
       ),
@@ -365,18 +370,15 @@ class _LoginPageState extends State<LoginRoute> {
     );
   }
 
-  void _dealWithResponse(data, WebSocketChannel channel) {
-    print(data);
+  void _dealWithResponse(data,StreamSubscription streamSubscription) {
     Map<String, dynamic> jsonObject = json.decode(data);
     if (jsonObject["resCode"] == "200" &&
         jsonObject["message"] == "login success") {
       //登陆成功
-
       //保存用户信息以及连接
       Map userJson = jsonObject["data"]["user"];
       User user = User.fromJson(userJson);
       Global.saveUser(user);
-      Global.saveWebSocketChannel(channel);
 
       //调用navigate
       Navigator.pushReplacement(
@@ -386,6 +388,8 @@ class _LoginPageState extends State<LoginRoute> {
               builder: (context) {
                 return new MessagersListRoute();
               }));
+      streamSubscription.cancel();
+
     } else {
       _notSatisfied();
     }
