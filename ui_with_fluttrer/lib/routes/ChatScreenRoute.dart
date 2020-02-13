@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:ui_with_fluttrer/common/Global.dart';
+import 'package:ui_with_fluttrer/common/MessageFileHelper.dart';
 import 'package:ui_with_fluttrer/common/PacketEncode.dart';
 import 'package:ui_with_fluttrer/components/ChatMessage.dart';
+import 'package:ui_with_fluttrer/components/MessageWrap.dart';
 import 'package:ui_with_fluttrer/models/User.dart';
 import 'package:ui_with_fluttrer/models/index.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ChatScreenRoute extends StatelessWidget {
   User user;
@@ -22,7 +22,6 @@ class ChatScreenRoute extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(user.userName),
-        backgroundColor: Colors.amberAccent,
       ),
       body: new ChatScreen(
         user: user,
@@ -47,34 +46,39 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   User user;
   StreamSubscription streamSubscription;
 
-  FocusNode _focusTextFieldComposer= new FocusNode();
+  FocusNode _focusTextFieldComposer = new FocusNode();
 
   ScrollController scrollController = new ScrollController();
-
 
   ChatScreenState(User user) {
     this.user = user;
   }
 
   Future<Null> _focusNodeListener() async {
-    if(_focusTextFieldComposer.hasFocus){
-      Timer(Duration(milliseconds: 200), () => scrollController.jumpTo(scrollController.position.maxScrollExtent));
+    if (_focusTextFieldComposer.hasFocus) {
+      Timer(
+          Duration(milliseconds: 200),
+          () => scrollController
+              .jumpTo(scrollController.position.maxScrollExtent));
     }
   }
 
   @override
   void initState() {
-    //消息从库里面拉 （本地）todo
-    Future readMessagesFuture = _readMessages();
+    //消息从库里面拉 （本地）
+    Future readMessagesFuture = MessageFileHelper.readMessages(user);
     _focusTextFieldComposer.addListener(_focusNodeListener);
 
     //对本地存储消息的处理
     readMessagesFuture.then((string) {
-      if(string == null){
+      if (string == null) {
         return;
       }
-      List<dynamic> list = json.decode(string);
-      for(String s in list){
+      List<String> list =  string.split("%%");
+      for (String s in list) {
+        if(s == ""){ //最后一个分隔符处理
+          continue;
+        }
         Map jsonObj = json.decode(s);
         ChatMessage message = new ChatMessage(
           user: User.fromJson(jsonObj["user"]),
@@ -94,9 +98,6 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       setState(() {
         //do nothing just refresh view
       });
-
-
-
     });
 
     streamSubscription = Global.getStreamController().stream.listen((data) {
@@ -106,20 +107,21 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         Map fromUserJson = jsonObject["data"]["fromUser"];
         String text = jsonObject["data"]["message"];
         insertMessageToList(text, User.fromJson(fromUserJson), false);
+
       }
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-
     //打开界面自动到底部
-    Timer(Duration(milliseconds: 200), () => scrollController.jumpTo(scrollController.position.maxScrollExtent));
+    Timer(
+        Duration(milliseconds: 200),
+        () =>
+            scrollController.jumpTo(scrollController.position.maxScrollExtent));
 
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         _focusTextFieldComposer.unfocus();
       },
       child: new Column(
@@ -130,10 +132,13 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             //new
             child: new ListView.builder(
               //new
-              controller :scrollController,
-              padding: new EdgeInsets.all(8.0), //new
-              reverse: false, //new
-              itemBuilder: (_, int index) => _messages[index], //new
+              controller: scrollController,
+              padding: new EdgeInsets.all(8.0),
+              //new
+              reverse: false,
+              //new
+              itemBuilder: (_, int index) => _messages[index],
+              //new
               itemCount: _messages.length, //new
             ), //new
           ), //new
@@ -148,7 +153,6 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       ),
     );
   }
-
 
   //构造底部发送栏
   Widget _buildTextComposer() {
@@ -190,8 +194,6 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         ));
   }
 
-
-
   void _handleSubmitted(String text) {
     int sendMessage = 2;
     int algorithm = 1;
@@ -210,46 +212,17 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     Global.getWebSocketChannel().sink.add(bytes);
 
     insertMessageToList(text, Global.user, true);
+
+    MessageWrap messageWrap =
+        MessageWrap(user: Global.user, text: text, selfFlag: true);
+
+    MessageFileHelper.saveMessage(messageWrap,user);
   }
 
-  Future<File> _getLocalFile() async {
-    // get the path to the document directory.
-    String dir = (await getApplicationDocumentsDirectory()).path;
-    String idStr = user.userId.toString();
-    return new File('$dir/messages_$idStr');
-  }
 
-  Future<String> _readMessages() async {
-    try {
-      File file = await _getLocalFile();
 
-      String contents = await file.readAsString();
-//      List<ChatMessage> res = new List<ChatMessage>();
-//
-//
-//      List<String> messageList = json.decode(contents);
-      return contents;
-    } on FileSystemException {}
-  }
 
-  Future<Null> _saveMessages() async {
-    File file = await _getLocalFile();
-    List<String> res = new List<String>();
-    for (ChatMessage chatMessage in _messages) {
-      MessageWrap messageWrap = new MessageWrap(
-          user: chatMessage.user,
-          text: chatMessage.text,
-          selfFlag: chatMessage.selfFlag);
-//     res.add(messageWrap);
-      Map jsonObject = MessageWrap.toJson(messageWrap);
-      String str = json.encode(jsonObject);
-      res.add(str);
-    }
 
-    String content = json.encode(res);
-
-    await file.writeAsString(content);
-  }
   void insertMessageToList(String text, User user, bool flag) {
     ChatMessage message = new ChatMessage(
       user: user,
@@ -268,11 +241,9 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     });
     message.animationController.forward();
   }
+
   @override
   void dispose() {
-    //消息落库（本地）todo
-    _saveMessages();
-
     scrollController.removeListener(_focusNodeListener);
 
     for (ChatMessage message in _messages) //new
@@ -282,25 +253,4 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     streamSubscription.cancel();
     super.dispose(); //new
   }
-}
-
-class MessageWrap {
-  User user;
-  String text;
-  bool selfFlag;
-
-  MessageWrap({this.user, this.text, this.selfFlag});
-
-  static MessageWrap fromJson(Map<String, dynamic> json) {
-    return MessageWrap()
-      ..user = json['user'] as User
-      ..text = json['text'] as String
-      ..selfFlag = json['selfFlag'] as bool;
-  }
-
-  static Map<String, dynamic> toJson(MessageWrap instance) => <String, dynamic>{
-        'user': instance.user,
-        'text': instance.text,
-        'selfFlag': instance.selfFlag,
-      };
 }

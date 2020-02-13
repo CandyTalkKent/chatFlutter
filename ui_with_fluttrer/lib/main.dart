@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ui_with_fluttrer/routes/LoginRoute.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'common/Global.dart';
+import 'common/LifecycleEventHandler.dart';
 
 void main() {
   //连接netty 后台服务端进行长连接
@@ -27,26 +29,28 @@ void main() {
   runApp(new FriendlychatApp());
 }
 
-//final ThemeData kIOSTheme = new ThemeData(
-//  primarySwatch: Colors.orange,
-//  primaryColor: Colors.grey[100],
-//  primaryColorBrightness: Brightness.light,
-//);
-//
-//final ThemeData kDefaultTheme = new ThemeData(
-//  primarySwatch: Colors.purple,
-//  accentColor: Colors.orangeAccent[400],
-//);
+final ThemeData kIOSTheme = new ThemeData(
+  primarySwatch: Colors.orange,
+  primaryColor: Colors.grey[100],
+  primaryColorBrightness: Brightness.light,
+);
+
+final ThemeData kDefaultTheme = new ThemeData(
+  primarySwatch: Colors.purple,
+  accentColor: Colors.orangeAccent[400],
+);
 
 class FriendlychatApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
         title: "Friendlychat",
+        theme: kIOSTheme,
         home: WillPopScope(
           onWillPop:() async{
             //发起请求 删除服务端连接
-
+            print("应用程序退出");
+            SystemChannels.platform.invokeMethod('SystemNavigator.pop');
             Global.getStreamController().close();
           },
           child: Scaffold(

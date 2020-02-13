@@ -6,7 +6,9 @@ import 'package:ui_with_fluttrer/routes/ChatScreenRoute.dart';
 class MessagerItem extends StatelessWidget {
   User user;
 
-  MessagerItem({this.user});
+  String lastMessage;
+
+  MessagerItem({this.user,this.lastMessage});
 
 
 //  ClipRRect( //剪裁为圆角矩形
@@ -39,7 +41,7 @@ class MessagerItem extends StatelessWidget {
               title: Text(Global.getUser().userName == user.userName
                   ? "我"
                   : user.userName),
-              subtitle: Text('last message'),
+              subtitle: Text(lastMessage??""),
               onTap: () => _dealWithTap(context),
             ),
           ],

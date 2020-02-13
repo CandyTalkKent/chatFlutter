@@ -114,13 +114,10 @@ class _LoginPageState extends State<LoginRoute> {
     Widget logoImageArea = new Container(
       alignment: Alignment.topCenter,
       // 设置图片为圆形
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(),
-        ),
+      child:ClipRRect(
+        borderRadius: BorderRadius.all(Radius.circular(510)),
         child: Image.asset(
-          "images/WechatIMG1.jpeg",
+          "images/timg.jpeg",
           height: 100,
           width: 100,
           fit: BoxFit.cover,
@@ -133,7 +130,7 @@ class _LoginPageState extends State<LoginRoute> {
       margin: EdgeInsets.only(left: 20, right: 20),
       decoration: new BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(8)),
-          color: Colors.white),
+          ),
       child: new Form(
         key: _formKey,
         child: new Column(
@@ -201,7 +198,6 @@ class _LoginPageState extends State<LoginRoute> {
       margin: EdgeInsets.only(left: 20, right: 20),
       height: 45.0,
       child: new RaisedButton(
-        color: Colors.blue[300],
         child: Text(
           "登录",
           style: Theme.of(context).primaryTextTheme.headline,
@@ -258,13 +254,11 @@ class _LoginPageState extends State<LoginRoute> {
               Container(
                 width: 80,
                 height: 1.0,
-                color: Colors.grey,
               ),
               Text('第三方登录'),
               Container(
                 width: 80,
                 height: 1.0,
-                color: Colors.grey,
               ),
             ],
           ),
@@ -275,20 +269,17 @@ class _LoginPageState extends State<LoginRoute> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               IconButton(
-                color: Colors.green[200],
                 // 第三方库icon图标
                 icon: Icon(FontAwesomeIcons.weixin),
                 iconSize: 40.0,
                 onPressed: () {},
               ),
               IconButton(
-                color: Colors.green[200],
                 icon: Icon(FontAwesomeIcons.facebook),
                 iconSize: 40.0,
                 onPressed: () {},
               ),
               IconButton(
-                color: Colors.green[200],
                 icon: Icon(FontAwesomeIcons.qq),
                 iconSize: 40.0,
                 onPressed: () {},
@@ -310,7 +301,6 @@ class _LoginPageState extends State<LoginRoute> {
             child: Text(
               "忘记密码?",
               style: TextStyle(
-                color: Colors.grey,
                 fontSize: 16.0,
               ),
             ),
@@ -321,7 +311,6 @@ class _LoginPageState extends State<LoginRoute> {
             child: Text(
               "快速注册",
               style: TextStyle(
-                color: Colors.blue[400],
                 fontSize: 16.0,
               ),
             ),
@@ -333,7 +322,6 @@ class _LoginPageState extends State<LoginRoute> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
       // 外层添加一个手势，用于点击空白部分，回收键盘
       body: new GestureDetector(
         onTap: () {

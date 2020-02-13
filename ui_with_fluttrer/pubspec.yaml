@@ -36,6 +36,17 @@ dependencies:
   dio: ^3.0.8
   path_provider: ^1.6.0
 
+  #状态管理
+  provider: ^4.0.4
+
+
+
+  #通讯录支持组件
+  azlistview: ^0.1.2  #latest version
+
+  #汉字转拼音
+  lpinyin: ^1.0.8
+
 
 
 dev_dependencies:
