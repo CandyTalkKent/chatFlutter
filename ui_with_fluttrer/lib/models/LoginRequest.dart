@@ -5,6 +5,9 @@ part 'LoginRequest.g.dart';
 
 @JsonSerializable()
 class LoginRequest extends Serializable{
+
+    static int login = 1;
+    static int algorithm = 1;
     LoginRequest();
 
     User user;

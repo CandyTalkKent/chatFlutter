@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ui_with_fluttrer/common/Global.dart';
+import 'package:ui_with_fluttrer/common/LoginFileHelper.dart';
 import 'package:ui_with_fluttrer/common/PacketEncode.dart';
 import 'package:ui_with_fluttrer/models/User.dart';
 import 'package:ui_with_fluttrer/models/index.dart';
@@ -211,8 +212,6 @@ class _LoginPageState extends State<LoginRoute> {
           _focusNodeUserName.unfocus();
 
           if (_formKey.currentState.validate()) {
-            int login = 1;
-            int algorithm = 1;
             //只有输入通过验证，才会执行这里
             _formKey.currentState.save();
             //todo 登录操作
@@ -226,7 +225,7 @@ class _LoginPageState extends State<LoginRoute> {
                 LoginRequest.wrap(user: user, password: "$_password");
 
             Uint8List bytes =
-                PacketEncode.encode(loginRequest, login, algorithm);
+                PacketEncode.encode(loginRequest, LoginRequest.login, LoginRequest.algorithm);
 
 
             Global.getWebSocketChannel().sink.add(bytes);
@@ -367,6 +366,9 @@ class _LoginPageState extends State<LoginRoute> {
       Map userJson = jsonObject["data"]["user"];
       User user = User.fromJson(userJson);
       Global.saveUser(user);
+
+      //保存登陆信息至本地
+      LoginFileHelper.saveLoginInfo(user,  _password);
 
       //调用navigate
       Navigator.pushReplacement(

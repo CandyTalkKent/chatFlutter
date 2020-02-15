@@ -8,7 +8,9 @@ class MessagerItem extends StatelessWidget {
 
   String lastMessage;
 
-  MessagerItem({this.user,this.lastMessage});
+  String lastMessageTime;
+
+  MessagerItem({this.user,this.lastMessage,this.lastMessageTime}): assert (lastMessageTime != null);
 
 
 //  ClipRRect( //剪裁为圆角矩形

@@ -103,11 +103,12 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     streamSubscription = Global.getStreamController().stream.listen((data) {
       Map<String, dynamic> jsonObject = json.decode(data);
       if (jsonObject["resCode"] == "200" && jsonObject["type"] == "2") {
-        //说明是来信
         Map fromUserJson = jsonObject["data"]["fromUser"];
         String text = jsonObject["data"]["message"];
-        insertMessageToList(text, User.fromJson(fromUserJson), false);
-
+       User fromUser  = User.fromJson(fromUserJson);
+       if(fromUser.userId == user.userId){//判断处于这个chatscreen
+         insertMessageToList(text,fromUser, false);
+       }
       }
     });
   }
